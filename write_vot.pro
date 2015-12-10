@@ -41,7 +41,7 @@ pro write_vot, file, data, headcol, headtable, TNAME= Tname, PARAM =param, debug
 ;     S. Erard, LESIA, Sept 2015: added Param & Table name, optional - seems OK
 ;-
 ;******************************************************************************
-if n_params() gt 4 or n_params() lt 2  then message,  'usage: write_vot= file, data, headcol)'silent = keyword_set(silent)
+if n_params() gt 4 or n_params() lt 2  then message,  'usage: write_vot, file, data, headcol'silent = keyword_set(silent)
 
 ; must remove file first - STILTS won't erase it 
 a = (b = '')	; grab error message if no file presentspawn, "rm /tmp/tmp.csv", a, b	
