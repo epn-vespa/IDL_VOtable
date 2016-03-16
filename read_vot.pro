@@ -59,8 +59,8 @@ function read_vot, file, headtable, PARAM =param, header_fits= header1, debug = 
 ;
 ; MODIFICATION HISTORY:
 ;     S. Erard, LESIA, May 2015
-;     S. Erard, LESIA, March 2016: parse parameters and pass them in output; 
-;								   also pass the intermediate fits header
+;     S. Erard, LESIA, March 2016: parse parameters and pass them in output
+;	                               also pass the intermediate fits header
 ;-
 ;******************************************************************************
 
