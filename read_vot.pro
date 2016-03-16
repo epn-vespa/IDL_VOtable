@@ -1,4 +1,4 @@
-function read_vot, file, headtable, PARAM =param, debug = debug
+function read_vot, file, headtable, PARAM =param, header_fits= header1, debug = debug
 
 ;+
 ; NOM:
@@ -23,6 +23,7 @@ function read_vot, file, headtable, PARAM =param, debug = debug
 ; KEYWORDS
 ;	PARAM: in output, contains param definitions in an array of structures
 ;		param= replicate({Name:'Toto', unit:'""', ucd:'""', desc:'""', value:'""'},Nb)
+;	HEADER_FITS: outputs fits header containing a description of fields
 ;	Debug - print messages
 ;
 ; EXAMPLE
@@ -58,7 +59,8 @@ function read_vot, file, headtable, PARAM =param, debug = debug
 ;
 ; MODIFICATION HISTORY:
 ;     S. Erard, LESIA, May 2015
-;     S. Erard, LESIA, March 2016: parse parameters and pass them in output
+;     S. Erard, LESIA, March 2016: parse parameters and pass them in output; 
+;								   also pass the intermediate fits header
 ;-
 ;******************************************************************************
 
