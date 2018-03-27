@@ -8,4 +8,4 @@ Read and write VOtables using STILTS
 
 - Writes a temporary file in /tmp, removes it when done
 
-- Support for Windows, but check where java and stilts are located
+- Support for Windows (but java and stilts paths are hard written, TBC)
