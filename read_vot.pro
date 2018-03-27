@@ -29,15 +29,30 @@ function read_vot, file, headtable, PARAM =param, header_fits= header1, debug = 
 ; EXAMPLE
 ;	qd=read_vot('test.xml', head) 
 ;	print, qd(0).session  ; scalar: elt 0 of column session
-;	
+; or	
+;	dir= !PLSPEC_LIB+ '/dataUSGS/data' 
+;	cd, dir                                                                   
+;	mb = read_vot('mars_bright.vot')                                            
+;	md = read_vot('mars_dark.vot')                                            
+; 	loadct, 12
+;	plot, md.(0), md.(1)	; one column against the other
+;	oplot, mb.(0), mb.(1), col=200
+
 ;
 ; PRECAUTIONS:
 ;   - Relies on STILTS library, which must be installed in the Unix path
 ;			set path = ($path /Applications/ApplisAstro/stilts)
+; 	- Under Windows, assumes java and stilts path as written here - change in routine if needed
 ;	- Writes a temporary file in /tmp, removes it when done
+;	     (uses the TEMP environment variable under Windows)
 ;
 ;
 ; COMMENT
+;
+;	*** Check file path filtering under Windows
+;	*** Check if it still works under GDL
+;	Add transpose option to return a table? 
+;		If qd contains 2 columns, get them with qd.(0), qd.(1)
 ;
 ; ** To edit a VOTable: 
 ; 	read VOTable
@@ -60,7 +75,8 @@ function read_vot, file, headtable, PARAM =param, header_fits= header1, debug = 
 ; MODIFICATION HISTORY:
 ;     S. Erard, LESIA, May 2015
 ;     S. Erard, LESIA, March 2016: parse parameters and pass them in output
-;	                               also pass the intermediate fits header
+;                                  also pass the intermediate fits header
+;     S. Erard, LESIA & B. Rousseau, IPAG, Feb/Mar 2018: added (limited) support for Windows
 ;-
 ;******************************************************************************
 
@@ -69,12 +85,28 @@ on_error, 2
 if n_params() gt 2 or n_params() lt 1  then message,  'usage: result = read_vot(file, [headtable])'
 silent = ~keyword_set(debug)
 
+
+unix = 0
+windows = 0
+if !version.OS_FAMILY eq 'unix' then unix = 1
+if !version.OS_FAMILY eq 'Windows' then windows = 1
+
+If windows then begin
+  STILTS_PATH='C:\stilts\stilts.jar'
+  java_exe='C:\java\bin\java.exe'
+  ftemp = getenv('Temp')+"\tmp.fits"
+endif else begin
+  ftemp = "/tmp/tmp.fits"
+endelse
+
+
+
 ;man_cmd = "stilts tpipe ifmt=votable in="+ file + "ofmt=fits-plus > /tmp/vvex.fits" 
 ; this preserves all info in the VOtable
 
 
 ;temp = file_search(file)	; does not work with Mac escape \
-temp = file_search(strjoin(strsplit(file, '\', /ext)))
+if unix then temp = file_search(strjoin(strsplit(file, '\', /ext))) else temp = file_search(file)
 If ~temp then message, 'File not found'
 ;spawn, "ls " + file, rep, rep2  
 ;If ~temp then message, 'File not found'
@@ -82,19 +114,22 @@ If ~temp then message, 'File not found'
 
 ; must remove file first - STILTS won't erase it 
 a = (b = '')	; grab error message if no fits present
-spawn, "rm /tmp/tmp.fits", a, b	
-man_cmd = "stilts tcopy " +file+ " /tmp/tmp.fits ifmt=votable ofmt=fits-plus" 
+spawn, "rm "+ftemp, a, b
+; spawn, "rm /tmp/tmp.fits", a, b		
+man_cmd = "stilts tcopy " +file+ " "+ ftemp +" ifmt=votable ofmt=fits-plus" 
+; man_cmd = "stilts tcopy " +file+ " /tmp/tmp.fits ifmt=votable ofmt=fits-plus" 
+if windows then man_cmd = java_exe+" -jar "+stilts_path+" tcopy " +file+ " "+ ftemp +" ifmt=votable ofmt=fits-plus" 
 spawn, man_cmd 
 
 If keyword_set(debug) then print, man_cmd
 If keyword_set(debug) then print, a, b
 ;wait , 10	; has to wait for stilts?
 
-headtable = mrdfits('/tmp/tmp.fits', 0, header0, silent=silent)
+headtable = mrdfits(ftemp, 0, header0, silent=silent)
 headtable= string(headtable) 	; contains all description (= VOtable header)
 
 ; Then fits extension + a fits header 
-t1=mrdfits('/tmp/tmp.fits', 1, header1, silent=silent)
+t1=mrdfits(ftemp, 1, header1, silent=silent)
 	; t1 is a structure containing the table itself	- result
 
 ; parsing the PARAM definition, first step
