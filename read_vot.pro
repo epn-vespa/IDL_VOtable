@@ -114,7 +114,9 @@ If ~temp then message, 'File not found'
 
 ; must remove file first - STILTS won't erase it 
 a = (b = '')	; grab error message if no fits present
-spawn, "rm "+ftemp, a, b
+If unix then spawn, "rm "+ftemp, a, b  else  spawn, "del "+ftemp+" /s /f /q", a, b	
+
+
 ; spawn, "rm /tmp/tmp.fits", a, b		
 man_cmd = "stilts tcopy " +file+ " "+ ftemp +" ifmt=votable ofmt=fits-plus" 
 ; man_cmd = "stilts tcopy " +file+ " /tmp/tmp.fits ifmt=votable ofmt=fits-plus" 

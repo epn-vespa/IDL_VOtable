@@ -88,7 +88,7 @@ if n_params() gt 4 or n_params() lt 2  then message,  'usage: write_vot, file, d
 
 ; must remove file first - STILTS won't erase it 
 a = (b = '')	; grab error message if no file present
-If unix then spawn, "rm /tmp/tmp.csv", a, b	$
+If unix then spawn, "rm " +csvtemp, a, b	$
  else  spawn, "del "+csvtemp+" /s /f /q", a, b	
 ;  the standard temp directory under windows seems to be %TEMP%, TBC
 ; else spawn, string( f='(A)', string(34b)+ "del "+ousearch+ "tmp.csv"+ string(34b)), a, b
